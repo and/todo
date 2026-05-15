@@ -1,6 +1,20 @@
 import type { Task, Goal, LifeArea } from "../types";
 import TaskItem from "./TaskItem";
 
+function isTaskActiveOnDate(task: Task, date: string): boolean {
+  if (task.scheduledDate === date) return true;
+  if (!task.recurring) return false;
+  if (task.scheduledDate > date) return false;
+  if (task.recurring === "daily") return true;
+  if (task.recurring === "weekly") {
+    const origin = new Date(task.scheduledDate + "T00:00:00");
+    const target = new Date(date + "T00:00:00");
+    return origin.getDay() === target.getDay();
+  }
+  return false;
+}
+
+
 interface Props {
   tasks: Task[];
   goals: Goal[];
@@ -35,7 +49,7 @@ export default function DailyView({
 }: Props) {
   const today = new Date().toISOString().slice(0, 10);
 
-  const dayTasks = tasks.filter((t) => t.scheduledDate === selectedDate);
+  const dayTasks = tasks.filter((t) => isTaskActiveOnDate(t, selectedDate));
   const done = dayTasks.filter((t) => t.completed).length;
   const pct = dayTasks.length ? Math.round((done / dayTasks.length) * 100) : 0;
 

@@ -28,7 +28,7 @@ export default function AddTaskModal({
   });
   const [why, setWhy] = useState("");
   const [scheduledDate, setScheduledDate] = useState(defaultDate);
-  const [recurring, setRecurring] = useState<"" | "daily" | "weekly">("");
+  const [recurring, setRecurring] = useState<"" | "daily" | "weekly">(preselectedGoalId ? "daily" : "");
 
   // When goal selection changes, auto-fill the life area
   function handleGoalChange(gid: string) {
