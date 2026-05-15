@@ -8,6 +8,7 @@ interface Props {
   lifeAreas: LifeArea[];
   onAddGoal: () => void;
   onAddTask: (goalId: string) => void;
+  onBreakWithAI: (goalId: string) => void;
   onToggleGoal: (id: string, completed: boolean) => void;
   onDeleteGoal: (id: string) => void;
 }
@@ -18,6 +19,7 @@ export default function GoalsView({
   lifeAreas,
   onAddGoal,
   onAddTask,
+  onBreakWithAI,
   onToggleGoal,
   onDeleteGoal,
 }: Props) {
@@ -77,6 +79,7 @@ export default function GoalsView({
             tasks={tasks}
             lifeArea={lifeAreas.find((a) => a.id === goal.lifeAreaId)}
             onAddTask={onAddTask}
+            onBreakWithAI={onBreakWithAI}
             onToggleComplete={onToggleGoal}
             onDelete={onDeleteGoal}
           />

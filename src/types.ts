@@ -43,4 +43,6 @@ export type ModalType =
   | { kind: "add-goal" }
   | { kind: "add-task"; goalId?: string }
   | { kind: "goal-detail"; goalId: string }
+  | { kind: "break-goal"; goalId: string }
+  | { kind: "api-key"; returnTo: ModalType }
   | null;

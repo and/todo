@@ -5,7 +5,11 @@ import DailyView from "./components/DailyView";
 import GoalsView from "./components/GoalsView";
 import AddGoalModal from "./components/AddGoalModal";
 import AddTaskModal from "./components/AddTaskModal";
+import ApiKeyModal from "./components/ApiKeyModal";
+import TaskBreakdownModal from "./components/TaskBreakdownModal";
 import "./App.css";
+
+const API_KEY_STORAGE = "intentional_anthropic_key";
 
 type Tab = "today" | "goals";
 
@@ -14,10 +18,29 @@ function App() {
   const [tab, setTab] = useState<Tab>("today");
   const [modal, setModal] = useState<ModalType>(null);
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem(API_KEY_STORAGE) ?? "");
 
   function openAddTask(goalId?: string) {
     setModal({ kind: "add-task", goalId });
   }
+
+  function openBreakWithAI(goalId: string) {
+    if (!apiKey) {
+      setModal({ kind: "api-key", returnTo: { kind: "break-goal", goalId } });
+    } else {
+      setModal({ kind: "break-goal", goalId });
+    }
+  }
+
+  function handleSaveApiKey(key: string) {
+    localStorage.setItem(API_KEY_STORAGE, key);
+    setApiKey(key);
+    const returnTo = modal?.kind === "api-key" ? modal.returnTo : null;
+    setModal(returnTo);
+  }
+
+  const breakGoalId = modal?.kind === "break-goal" ? modal.goalId : null;
+  const breakGoal = breakGoalId ? store.goals.find((g) => g.id === breakGoalId) : null;
 
   return (
     <div className="app">
@@ -71,6 +94,7 @@ function App() {
               openAddTask(goalId);
               setTab("today");
             }}
+            onBreakWithAI={openBreakWithAI}
             onToggleGoal={(id, completed) => store.updateGoal(id, { completed })}
             onDeleteGoal={store.deleteGoal}
           />
@@ -99,6 +123,28 @@ function App() {
             setModal(null);
           }}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal?.kind === "api-key" && (
+        <ApiKeyModal
+          onSave={handleSaveApiKey}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal?.kind === "break-goal" && breakGoal && (
+        <TaskBreakdownModal
+          goal={breakGoal}
+          lifeArea={store.lifeAreas.find((a) => a.id === breakGoal.lifeAreaId)}
+          apiKey={apiKey}
+          defaultDate={selectedDate}
+          onSaveTasks={(tasks) => {
+            tasks.forEach((t) => store.addTask(t));
+            setModal(null);
+          }}
+          onClose={() => setModal(null)}
+          onNeedApiKey={() => setModal({ kind: "api-key", returnTo: modal })}
         />
       )}
     </div>

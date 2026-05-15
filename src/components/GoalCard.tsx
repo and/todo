@@ -5,11 +5,12 @@ interface Props {
   tasks: Task[];
   lifeArea?: LifeArea;
   onAddTask: (goalId: string) => void;
+  onBreakWithAI: (goalId: string) => void;
   onToggleComplete: (id: string, completed: boolean) => void;
   onDelete: (id: string) => void;
 }
 
-export default function GoalCard({ goal, tasks, lifeArea, onAddTask, onToggleComplete, onDelete }: Props) {
+export default function GoalCard({ goal, tasks, lifeArea, onAddTask, onBreakWithAI, onToggleComplete, onDelete }: Props) {
   const goalTasks = tasks.filter((t) => t.goalId === goal.id);
   const doneTasks = goalTasks.filter((t) => t.completed);
   const progress = goalTasks.length ? Math.round((doneTasks.length / goalTasks.length) * 100) : 0;
@@ -66,13 +67,20 @@ export default function GoalCard({ goal, tasks, lifeArea, onAddTask, onToggleCom
         </div>
       )}
 
-      <button
-        className="btn btn-sm btn-outline"
-        onClick={() => onAddTask(goal.id)}
-        style={{ marginTop: "0.75rem" }}
-      >
-        + Add daily task
-      </button>
+      <div className="goal-card-actions">
+        <button
+          className="btn btn-sm btn-outline"
+          onClick={() => onAddTask(goal.id)}
+        >
+          + Add task
+        </button>
+        <button
+          className="btn btn-sm btn-ai"
+          onClick={() => onBreakWithAI(goal.id)}
+        >
+          ✨ Break with AI
+        </button>
+      </div>
     </div>
   );
 }
